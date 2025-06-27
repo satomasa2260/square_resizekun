@@ -4,7 +4,13 @@ const previewZone = document.getElementById('preview-zone');
 const downloadBtn = document.getElementById('download-btn');
 let currentCanvas = null;
 
-// ドラッグ&ドロップのイベント処理
+// WebP変換用のDOM要素
+const webpDropZone = document.getElementById('webp-drop-zone');
+const webpPreviewZone = document.getElementById('webp-preview-zone');
+const webpDownloadBtn = document.getElementById('webp-download-btn');
+let webpCanvas = null;
+
+// ドラッグ&ドロップのイベント処理（正方形化ツール）
 dropZone.addEventListener('dragover', (e) => {
   e.preventDefault();
   dropZone.classList.add('drag-over');
@@ -20,6 +26,25 @@ dropZone.addEventListener('drop', (e) => {
   const files = e.dataTransfer.files;
   if (files.length > 0) {
     handleImage(files[0]);
+  }
+});
+
+// WebP変換用のドラッグ&ドロップイベント処理
+webpDropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  webpDropZone.classList.add('drag-over');
+});
+
+webpDropZone.addEventListener('dragleave', (e) => {
+  webpDropZone.classList.remove('drag-over');
+});
+
+webpDropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  webpDropZone.classList.remove('drag-over');
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    handleWebPImage(files[0]);
   }
 });
 
@@ -74,7 +99,44 @@ function handleImage(file) {
   reader.readAsDataURL(file);
 }
 
-// ダウンロードボタンのクリックイベント
+// WebP→JPG変換処理
+function handleWebPImage(file) {
+  if (file.type !== 'image/webp') {
+    alert('WebP画像ファイルをドロップしてください。');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function (evt) {
+    const img = new Image();
+    img.onload = function () {
+      // Canvas作成（元のサイズを維持）
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      // 画像をそのまま描画
+      ctx.drawImage(img, 0, 0);
+      // プレビュー表示
+      webpPreviewZone.innerHTML = '';
+      webpPreviewZone.appendChild(canvas);
+      webpCanvas = canvas;
+      // ダウンロードボタン表示
+      webpDownloadBtn.style.display = 'inline-block';
+      // 画像を自動でダウンロード（JPG形式）
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'converted-image.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+    img.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ダウンロードボタンのクリックイベント（正方形化ツール）
 downloadBtn.addEventListener('click', () => {
   // #preview-zone 内のcanvas要素を取得
   const canvas = previewZone.querySelector('canvas');
@@ -85,6 +147,22 @@ downloadBtn.addEventListener('click', () => {
   const a = document.createElement('a');
   a.href = dataUrl;
   a.download = 'square-image.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+});
+
+// WebP変換用ダウンロードボタンのクリックイベント
+webpDownloadBtn.addEventListener('click', () => {
+  // #webp-preview-zone 内のcanvas要素を取得
+  const canvas = webpPreviewZone.querySelector('canvas');
+  if (!canvas) return;
+  // JPG形式のData URLに変換
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+  // aタグを動的に作成
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = 'converted-image.jpg';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

@@ -8,12 +8,32 @@
 </head>
 <body>
   <div class="container">
-    <h1>画像リサイズくん</h1>
-    <p>画像をドラッグ＆ドロップして、800x800ピクセルの正方形にリサイズできます。</p>
-    <div id="drop-zone">ここに画像をドラッグ＆ドロップ</div>
-    <div id="preview-zone"></div>
-    <button id="download-btn" style="display: none;">画像をダウンロード</button>
+    <h1>画像変換ツール</h1>
+    <p>画像をドラッグ＆ドロップして、正方形にリサイズできます。WebP画像のJPG変換も可能です。</p>
+    
+    <div class="tools-container">
+      <!-- 左側：正方形化ツール -->
+      <div class="tool-section">
+        <h2>正方形化ツール</h2>
+        <p>画像を800x800ピクセルの正方形にリサイズ</p>
+        <div id="drop-zone">ここに画像をドラッグ＆ドロップ</div>
+        <div id="preview-zone"></div>
+        <button id="download-btn" style="display: none;">画像をダウンロード</button>
+      </div>
+      
+      <!-- 右側：WebP→JPG変換ツール -->
+      <div class="tool-section">
+        <h2>WebP→JPG変換ツール</h2>
+        <p>WebP画像をJPG形式に変換</p>
+        <div id="webp-drop-zone">ここにWebP画像をドラッグ＆ドロップ</div>
+        <div id="webp-preview-zone"></div>
+        <button id="webp-download-btn" style="display: none;">JPG画像をダウンロード</button>
+      </div>
+    </div>
   </div>
   <script src="script.js"></script>
+  <footer style="margin-top:40px; text-align:center; color:#888; font-size:0.95em;">
+    <a href="terms.html" target="_blank" style="color:#3399ff; text-decoration:underline;">利用規約</a>
+  </footer>
 </body>
 </html> 
