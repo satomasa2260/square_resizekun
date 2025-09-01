@@ -171,8 +171,8 @@ function handle43Image(file) {
   reader.onload = function (evt) {
     const img = new Image();
     img.onload = function () {
-      const width = 800; // 4
-      const height = 600; // 3
+      const width = 1200; // X投稿用
+      const height = 675; // X投稿用
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = width;
@@ -197,7 +197,7 @@ function handle43Image(file) {
       const dataUrl = canvas.toDataURL('image/png');
       const a = document.createElement('a');
       a.href = dataUrl;
-      a.download = 'image-4x3.png';
+      a.download = 'x-post-image.png';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -239,14 +239,14 @@ webpDownloadBtn.addEventListener('click', () => {
   document.body.removeChild(a);
 });
 
-// 4:3ダウンロードボタン
+// X投稿用ダウンロードボタン
 ar43DownloadBtn.addEventListener('click', () => {
   const canvas = ar43PreviewZone.querySelector('canvas');
   if (!canvas) return;
   const dataUrl = canvas.toDataURL('image/png');
   const a = document.createElement('a');
   a.href = dataUrl;
-  a.download = 'image-4x3.png';
+  a.download = 'x-post-image.png';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
