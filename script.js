@@ -10,6 +10,12 @@ const webpPreviewZone = document.getElementById('webp-preview-zone');
 const webpDownloadBtn = document.getElementById('webp-download-btn');
 let webpCanvas = null;
 
+// 4:3比率ツールのDOM要素
+const ar43DropZone = document.getElementById('ar43-drop-zone');
+const ar43PreviewZone = document.getElementById('ar43-preview-zone');
+const ar43DownloadBtn = document.getElementById('ar43-download-btn');
+let ar43Canvas = null;
+
 // ドラッグ&ドロップのイベント処理（正方形化ツール）
 dropZone.addEventListener('dragover', (e) => {
   e.preventDefault();
@@ -45,6 +51,25 @@ webpDropZone.addEventListener('drop', (e) => {
   const files = e.dataTransfer.files;
   if (files.length > 0) {
     handleWebPImage(files[0]);
+  }
+});
+
+// 4:3ドラッグ&ドロップイベント
+ar43DropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  ar43DropZone.classList.add('drag-over');
+});
+
+ar43DropZone.addEventListener('dragleave', (e) => {
+  ar43DropZone.classList.remove('drag-over');
+});
+
+ar43DropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  ar43DropZone.classList.remove('drag-over');
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    handle43Image(files[0]);
   }
 });
 
@@ -136,6 +161,52 @@ function handleWebPImage(file) {
   reader.readAsDataURL(file);
 }
 
+// 4:3比率画像処理
+function handle43Image(file) {
+  if (!file.type.startsWith('image/')) {
+    alert('画像ファイルをドロップしてください。');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function (evt) {
+    const img = new Image();
+    img.onload = function () {
+      const width = 800; // 4
+      const height = 600; // 3
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = width;
+      canvas.height = height;
+      // 背景白
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, width, height);
+      // 縦横比維持でフィット
+      const scale = Math.min(width / img.width, height / img.height);
+      const destWidth = Math.round(img.width * scale);
+      const destHeight = Math.round(img.height * scale);
+      const x = Math.round((width - destWidth) / 2);
+      const y = Math.round((height - destHeight) / 2);
+      ctx.drawImage(img, x, y, destWidth, destHeight);
+      // プレビュー
+      ar43PreviewZone.innerHTML = '';
+      ar43PreviewZone.appendChild(canvas);
+      ar43Canvas = canvas;
+      // ボタン表示
+      ar43DownloadBtn.style.display = 'inline-block';
+      // 自動ダウンロード（PNG）
+      const dataUrl = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'image-4x3.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+    img.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 // ダウンロードボタンのクリックイベント（正方形化ツール）
 downloadBtn.addEventListener('click', () => {
   // #preview-zone 内のcanvas要素を取得
@@ -163,6 +234,19 @@ webpDownloadBtn.addEventListener('click', () => {
   const a = document.createElement('a');
   a.href = dataUrl;
   a.download = 'converted-image.jpg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+});
+
+// 4:3ダウンロードボタン
+ar43DownloadBtn.addEventListener('click', () => {
+  const canvas = ar43PreviewZone.querySelector('canvas');
+  if (!canvas) return;
+  const dataUrl = canvas.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = 'image-4x3.png';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
